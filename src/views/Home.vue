@@ -8,12 +8,9 @@
                         Search companies by symbol
                     </h4>
                 </v-flex>
-                <v-flex class="mt-5">
-                    <v-text-field
-                    label="Solo"
-                    append-icon="mdi-mouse"
-                    solo>
-                    </v-text-field>
+                <v-flex  class="textfield_search mt-5">
+                   <input v-model="busqueda" type="text" placeholder="Search Symbol">
+                    <img @click="search_method" src="../assets/Asset_Search.svg" alt="">
                 </v-flex>
             </v-layout>
             <v-layout justify-center>
@@ -123,12 +120,34 @@ export default {
     return{
        symbolsArray: [],
        topSymbolsArray: [],
+       busqueda: 'asdas'
     }
   },
   components:{
     Grafica
   },
       methods:{
+        search_method(){
+          let flag = false;
+
+          for(let i=0; i<= this.symbolsArray.length; i++)
+          {
+
+            if(this.busqueda == this.symbolsArray[0].symbol){
+              flag=true
+            }
+            else{
+              flag=false
+            }
+
+          }
+
+          if(flag){
+            console.log('existe');
+          }else{
+            console.log('no existe');
+          }
+        },
         show_gain_companies(){
           document.getElementById('gain_companies_ul').classList.add('active_ui');
           document.getElementById('gain_companies_ul').classList.remove('desactive_ui');
@@ -172,8 +191,11 @@ export default {
                 let InfoCompany = []
 
                 //request for list of symbols
-                let SymbolsList = await axios.get('https://sandbox.iexapis.com/stable/ref-data/symbols?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb',{params:{}})
+                let SymbolsList = await axios.get('https://sandbox.iexapis.com/stable/ref-data/symbols?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb',{ params:{
+                  _limit:"5"
+                }})
                 this.symbolsArray = await SymbolsList.data
+                console.log(SymbolsList.data)
                 //fill array with info
                 for(let i = 0; i<= 1; i++){
                     let Cashdata = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ this.symbolsArray[i].symbol +'/cash-flow?period=annual&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')    
@@ -211,7 +233,32 @@ export default {
 </script>
 
 <style scoop>
+.textfield_search{
+  background-color:white;
+  display:flex;
+  padding:10px 10px;
+  border-radius: 35px;
+  justify-content:flex-start;
+  align-content: center;
+  margin-bottom:20px;
+  
+}
+.textfield_search input{
+  outline: none;
+  width:100%;
+  color:Grey;
+  font-size:14px;
+  
 
+}
+.textfield_search img{
+  width:20px;
+  cursor:pointer;
+}
+
+.textfield_search img:hover{
+  opacity: .5;
+}
   #active_companies_ul{
     display:none !important;
   }
