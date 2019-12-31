@@ -21,7 +21,11 @@
             </v-card>
           </v-dialog>
     <v-layout wrap>
-      <v-flex xs12 md5 lg5 id="companies_list_containers">
+      <v-flex xs12 md3 lg3 class="secondary" style="display:flex; justify-content:center; align-items:center;" >
+        <img id="logo_vertical" style="height:10vh;" src="@/assets/Asset_Logo_vertical.svg" alt="">
+        <img id="logo_horizontal" style="height:10vh;" src="@/assets/Asset_Logo_Horizontal.svg" alt="">
+      </v-flex>
+      <v-flex xs12 md3 lg3 id="companies_list_containers">
             <v-layout class="pt-5 pl-5 pb-0 pr-5 list_content info"  justify-center align-center wrap>
                 <v-flex align-self-center xs6 md12 lg12>
                     <h4 class="white--text">
@@ -111,34 +115,12 @@
                         </li>
                     </ul>
 
-                    <div class="pt-3 pb-3 pl-4 pr-4 table_row">
-                      <v-layout wrap>
-                        <v-layout>
-                          <v-flex xs1 style="background-color:green;" class="primary">
-                            <center><img height="30px" src="@/assets/Asset_Arrow.svg" alt="backArrow"></center>
-                          </v-flex>
-                          <v-flex xs11>
-                              <v-flex xs12>
-                                <h5>sdasd</h5>
-                              </v-flex>
-                              <v-flex xs12 justify-center align-center justify-start>
-                                <span>
-                                  sadas
-                                </span>
-                                <span>
-                                  asd
-                                </span>
-                              </v-flex>
-                          </v-flex>
-                        </v-layout>
-                      </v-layout>
-                    </div>
 
                 </v-flex>
             </v-layout>
 
       </v-flex>
-      <v-flex  class="pt-5 pl-5 pb-0 pr-5 detail_content accent_light" xs12 md7 lg7>
+      <v-flex  class="pt-5 pl-5 pb-0 pr-5 detail_content accent_light" xs12 md6 lg6>
         <!-- dummy -->
         <v-layout id="select_company_display" align-center style="height:100vh;" wrap>
           <v-flex>
@@ -375,12 +357,9 @@ export default {
             }
         },
         async refreshDetail(i, arrayListado){
-          
-          
           let tableInfo = []
           let sector = ''
 
-          
           try{
               this.flag = true
               document.getElementById('select_company_display').classList.add('desactive_ui');
@@ -461,7 +440,28 @@ export default {
 
 <style scoop>
 
-@media (max-width:900px) and (min-width: 600px) {
+
+  #logo_vertical{
+    display:flex;
+  }
+  #logo_horizontal{
+    display:none;
+    height:5vh;
+    margin:3vh;
+  }
+
+@media (max-width:960px) {
+  #logo_vertical{
+    display:none !important;
+  }
+  #logo_horizontal{
+    display:flex !important;
+  }
+}
+
+@media (flex-width:900px) and (min-width: 600px) {
+
+  
   #gain_companies_ul,
   #active_companies_ul,
   #search_companies_ul{
