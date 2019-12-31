@@ -5,13 +5,21 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        symbolsArray: [],
-        topSymbolsArray: [],
-        value: "120",
-        
+        loading: {
+            escado: false,
+            color: 'primary'
+        }
+    },
+    mutations: {
+        showLoading(state, payload) {
+            state.loading.estado = true
+            state.color = payload.color
+        },
+        hideLoading() {
+            state.loading.estado = false
+        }
 
     },
-    mutations: {},
     actions: {
 
     },

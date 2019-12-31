@@ -4,6 +4,8 @@
     <v-content>
       <v-container style="padding:0;" fluid>
 
+ 
+          
         <router-view/>
       </v-container>
     </v-content>

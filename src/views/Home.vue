@@ -1,5 +1,25 @@
 <template>
   <div class="home">
+           <v-dialog
+            v-model="flag"
+            hide-overlay
+            persistent
+            width="300">
+
+            <v-card
+              color="info"
+              dark>
+
+              <v-card-text>
+                Loading
+                <v-progress-linear
+                  indeterminate
+                  color="white"
+                  class="mb-0"
+                ></v-progress-linear>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
     <v-layout wrap>
       <v-flex xs12 md5 lg5>
             <v-layout class="pt-5 pl-5 pb-0 pr-5 list_content info" justify-center align-center wrap>
@@ -9,7 +29,7 @@
                     </h4>
                 </v-flex>
                 <v-flex  class="textfield_search mt-5">
-                   <input v-model="busqueda" type="text" placeholder="Search Symbol">
+                   <input @keyup.enter="search_method"  v-model="busqueda" type="text" placeholder="Search Symbol">
                     <img @click="search_method" src="../assets/Asset_Search.svg" alt="">
                 </v-flex>
             </v-layout>
@@ -21,16 +41,16 @@
             <v-layout justify-center>
                 <v-flex>
                     <ul id="gain_companies_ul"  style="padding: 0; list-style:none;">
-                        <li @click="refreshDetail(index)" v-for="(item, index) of masterArray" :key="index">
+                        <li @click="refreshDetail(index, masterArrayActive)" v-for="(item, index) of masterArrayActive" :key="index">
                             <div class="pt-3 pb-3 pl-4 pr-4 table_row">
                                 <v-layout wrap>
                                     <v-flex xs12>
-                                        <h5>{{masterArray[index].name}}</h5>
+                                        <h5>{{masterArrayActive[index].name}}</h5>
 
                                     </v-flex>
                                     <v-flex xs12 justify-center align-center justify-start>
                                         <span>
-                                            {{masterArray[index].symbol}}
+                                            {{masterArrayActive[index].symbol}}
                                         </span>
                                         <span>
                                             {{index + 1}}
@@ -43,17 +63,17 @@
                     </ul>
 
                       <ul id="active_companies_ul" style="padding: 0; list-style:none;" >
-                        <li @click="refreshDetail(index) " v-for="(item, index) of masterArray" :key="index">
+                        <li @click="refreshDetail(index, masterArrayGain) " v-for="(item, index) of masterArrayGain" :key="index">
                           
                             <div class="pt-3 pb-3 pl-4 pr-4 table_row">
                                 <v-layout wrap>
                                     <v-flex xs12>
-                                        <h5>gain companie name</h5>
+                                        <h5>{{masterArrayGain[index].name}}</h5>
 
                                     </v-flex>
                                     <v-flex xs12 justify-center align-center justify-start>
                                         <span>
-                                            gain companie symbol
+                                            {{masterArrayGain[index].symbol}}
                                         </span>
                                         <span>
                                             sss
@@ -64,6 +84,31 @@
                             </div>
                         </li>
                     </ul>
+
+                    
+                      <ul id="search_companies_ul" style="padding: 0; list-style:none;" >
+                        <li @click="refreshDetail(index, masterArraySearch) " v-for="(item, index) of masterArraySearch" :key="index">
+                          
+                            <div class="pt-3 pb-3 pl-4 pr-4 table_row">
+                                <v-layout wrap>
+                                    <v-flex xs12>
+                                        <h5>{{masterArraySearch[index].name}}</h5>
+
+                                    </v-flex>
+                                    <v-flex xs12 justify-center align-center justify-start>
+                                        <span>
+                                        {{masterArraySearch[index].symbol}}
+                                        </span>
+                                        <span>
+                                            {{index+1}}
+                                        </span>
+
+                                    </v-flex>
+                                </v-layout>
+                            </div>
+                        </li>
+                    </ul>
+
                 </v-flex>
             </v-layout>
 
@@ -132,6 +177,7 @@
 import axios from 'axios'
 import { Bar } from 'vue-chartjs'
 import Grafica from '../components/Grafica.vue'
+import { mapMutations } from 'vuex'
 
 export default {
   extends:Bar,
@@ -139,36 +185,19 @@ export default {
   data(){
     return{
        symbolsArray: [],
-       masterArray: [],
        infoTable: [],
-       busqueda: 'Busqueda chida'
+       masterArrayActive: [],
+       masterArrayGain: [],
+       masterArraySearch: [],
+       busqueda: '',
+       flag: false
     }
   },
   components:{
     Grafica
   },
       methods:{
-        search_method(){
-          let flag = false;
-
-          for(let i=0; i<= this.symbolsArray.length; i++)
-          {
-
-            if(this.busqueda == this.symbolsArray[0].symbol){
-              flag=true
-            }
-            else{
-              flag=false
-            }
-
-          }
-
-          if(flag){
-            console.log('existe');
-          }else{
-            console.log('no existe');
-          }
-        },
+        
         show_gain_companies(){
           document.getElementById('gain_companies_ul').classList.add('active_ui');
           document.getElementById('gain_companies_ul').classList.remove('desactive_ui');
@@ -178,6 +207,10 @@ export default {
 
           document.getElementById('tap_gain_companies').classList.add('active_tap');
           document.getElementById('tap_active_companies').classList.remove('active_tap');
+          
+          document.getElementById('search_companies_ul').classList.remove('active_ui');
+          document.getElementById('search_companies_ul').classList.add('desactive_ui');
+
 
         },
         show_active_companies(){
@@ -189,72 +222,132 @@ export default {
           
           document.getElementById('tap_gain_companies').classList.remove('active_tap');
           document.getElementById('tap_active_companies').classList.add('active_tap');
+          
+          document.getElementById('search_companies_ul').classList.remove('active_ui');
+          document.getElementById('search_companies_ul').classList.add('desactive_ui');
 
         },
-        async refreshDetail(i){
+        async search_method(){
+          let searchArraySuggest = []
+          let searchElement =[]
+          this.masterArraySearch = []
 
-          let tableInfo = []
+          try{
+            this.flag = true
+            searchArraySuggest = await axios.get('https://sandbox.iexapis.com/stable/search/' + this.busqueda + '?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
+            console.log(searchArraySuggest.data.length)
 
-          console.log("---------");
-          console.log(this.masterArray[i].name);
-          console.log(this.masterArray[i].symbol);
-          console.log(this.masterArray[i].closeTime);
+            for(let i = 0; i<= searchArraySuggest.data.length - 1; i++){
+            searchElement = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ searchArraySuggest.data[i].symbol+'/book?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
+            console.log(searchElement)
+            this.masterArraySearch.push({
+                name: searchElement.data.quote.companyName,
+                symbol : searchElement.data.quote.symbol,
+                closeTime : searchElement.data.quote.closeTime,
+              })
+            }
+
+            document.getElementById('gain_companies_ul').classList.add('desactive_ui');
+            document.getElementById('gain_companies_ul').classList.remove('active_ui');
+            document.getElementById('active_companies_ul').classList.add('desactive_ui');
+            document.getElementById('active_companies_ul').classList.remove('active_ui');
+            document.getElementById('search_companies_ul').classList.add('active_ui');
+            document.getElementById('search_companies_ul').classList.remove('desactive_ui');
           
+            document.getElementById('tap_gain_companies').classList.remove('active_tap');
+            document.getElementById('tap_active_companies').classList.add('active_tap');
+            
 
-          document.getElementById('select_company_display').classList.add('desactive_ui');
-          document.getElementById('detail_company_display').classList.add('active_ui');
-
-          document.getElementById('companyName_Detail').textContent = this.masterArray[i].name;
-          document.getElementById('symbol_Detail').textContent = this.masterArray[i].symbol;
-
-          if(this.masterArray[i].closeTime === null){
-              document.getElementById('close_Time').textContent = "Not close Time";
-          }else{
-              document.getElementById('close_Time').textContent = this.masterArray[i].closeTime;
           }
-          
-          tableInfo = await axios.get('https://sandbox.iexapis.com/stable/stock/twtr/chart/max?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
-          this.infoTable = tableInfo.data
-          console.log("tableInfo: ")
-          console.log(tableInfo)
+          catch(error){
+            console.log(error)
+          }
+          finally{
+            this.flag = false
+          }
+          console.log(this.masterArraySearch)
+        },
+        async refreshDetail(i, arrayListado){
+          console.log('update')
+          console.log(arrayListado)
+          let tableInfo = []
+          let sector = ''
 
           
-          //document.getElementById('sector_Detail').textContent = this.topSymbolsArray[i].sector;
-          //document.getElementById('stock_value').textContent = this.topSymbolsArray[0].stockValue;
-          //document.getElementById('stock_tax_value').textContent = (this.topSymbolsArray[0].stockValue*0.05)+' '+ this.topSymbolsArray[0].currency
+          try{
+              this.flag = true
+              document.getElementById('select_company_display').classList.add('desactive_ui');
+              document.getElementById('detail_company_display').classList.add('active_ui');
+
+              document.getElementById('companyName_Detail').textContent = arrayListado[i].name;
+              document.getElementById('symbol_Detail').textContent = arrayListado[i].symbol;
+
+              if(arrayListado[i].closeTime === null){
+                  document.getElementById('close_Time').textContent = "Not close Time";
+              }else{
+                  document.getElementById('close_Time').textContent = arrayListado[i].closeTime;
+              }
+              
+              tableInfo = await axios.get('https://sandbox.iexapis.com/stable/stock/twtr/chart/max?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
+              this.infoTable = tableInfo.data
+              console.log("tableInfo: ")
+              console.log(tableInfo)
+
+              sector = await axios.get('https://sandbox.iexapis.com/stable/stock/'+arrayListado[i].symbol+'/company?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb&filter=sector')
+              console.log("sector: ")
+              console.log(sector)
+
+              document.getElementById('sector_Detail').textContent = sector.data.sector;
+              //document.getElementById('stock_value').textContent = this.topSymbolsArray[0].stockValue;
+              //document.getElementById('stock_tax_value').textContent = (this.topSymbolsArray[0].stockValue*0.05)+' '+ this.topSymbolsArray[0].currency
+          }catch(error){
+            console.log(error)
+          }finally{
+            this.flag = false
+          }
+
         },
         async getSymbolsInfo(){
           
                 //method vars
                 let InfoCompany = []
                 let mostActive = []
-               
+                let mostGain = []
+                    
+                  try{
+                    this.flag = true
+                    mostActive = await axios.get('https://sandbox.iexapis.com/stable/stock/market/collection/list?collectionName=mostactive&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                    mostGain = await axios.get('https://sandbox.iexapis.com/stable/stock/market/list/gainers?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
 
-                mostActive = await axios.get('https://sandbox.iexapis.com/stable/stock/market/collection/list?collectionName=mostactive&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
-                
+                      //top gains fill array
+                      for(let i = 0; i<= 10; i++){
 
-                console.log('mostActive: ')
-                console.log(mostActive.data)
-
-                for(let i = 0; i<= mostActive.data.length-2; i++){
-                  console.log('entro')
-                  this.masterArray.push({
-                    name : mostActive.data[i].companyName,
-                    symbol : mostActive.data[i].symbol,
-                    closeTime : mostActive.data[i].closeTime,
-
-                  })
-                }
-                console.log("masterArray: ")
-                console.log(this.masterArray)
+                        if(i<=7){
+                          this.masterArrayGain.push({
+                            name : mostGain.data[i].companyName,
+                            symbol : mostGain.data[i].symbol,
+                            closeTime : mostGain.data[i].closeTime,
+                          })
+                        }
+                        //top actives fill array
+                        this.masterArrayActive.push({
+                          name : mostActive.data[i].companyName,
+                          symbol : mostActive.data[i].symbol,
+                          closeTime : mostActive.data[i].closeTime,
+                        })
+                      }
+                  
+                  }catch(error){
+                    console.log(error)
+                  }finally{
+                    this.flag = false
+                  }
                 },
 
         },
-   
-   
-
     created(){
         this.getSymbolsInfo()
+        this.masterArrayTemporal = this.masterArrayActive
 
 
     },
