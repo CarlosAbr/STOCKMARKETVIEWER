@@ -14,23 +14,23 @@
                 </v-flex>
             </v-layout>
             <v-layout justify-center>
-                <v-flex id="tap_gain_companies" @click="show_gain_companies()" class="active_tap pt-3 pb-3" text-center xs6>Top Gain Companies</v-flex>
-                <v-flex id="tap_active_companies" @click="show_active_companies()" class="pt-3 pb-3" text-center xs6>Top Most Active Companies</v-flex>
+                <v-flex id="tap_gain_companies" @click="show_gain_companies()" class="active_tap pt-3 pb-3" text-center xs6>Top Most Active Companies</v-flex>
+                <v-flex id="tap_active_companies" @click="show_active_companies()" class="pt-3 pb-3" text-center xs6>Top Gain Companies</v-flex>
             </v-layout>
 
             <v-layout justify-center>
                 <v-flex>
-                    <ul id="gain_companies_ul" v-for="(item, index) of topSymbolsArray" :key="index" style="padding: 0; list-style:none;">
-                        <li @click="refreshDetail(index)">
+                    <ul id="gain_companies_ul"  style="padding: 0; list-style:none;">
+                        <li @click="refreshDetail(index)" v-for="(item, index) of masterArray" :key="index">
                             <div class="pt-3 pb-3 pl-4 pr-4 table_row">
                                 <v-layout wrap>
                                     <v-flex xs12>
-                                        <h5>{{topSymbolsArray[index].companyName}}</h5>
+                                        <h5>{{masterArray[index].name}}</h5>
 
                                     </v-flex>
                                     <v-flex xs12 justify-center align-center justify-start>
                                         <span>
-                                            {{topSymbolsArray[index].symbol}}
+                                            {{masterArray[index].symbol}}
                                         </span>
                                         <span>
                                             {{index + 1}}
@@ -42,20 +42,21 @@
                         </li>
                     </ul>
 
-                      <ul id="active_companies_ul" v-for="(item, index) of topSymbolsArray" :key="index" style="padding: 0; list-style:none;" >
-                        <li @click="refreshDetail(index)">
+                      <ul id="active_companies_ul" style="padding: 0; list-style:none;" >
+                        <li @click="refreshDetail(index) " v-for="(item, index) of masterArray" :key="index">
+                          
                             <div class="pt-3 pb-3 pl-4 pr-4 table_row">
                                 <v-layout wrap>
                                     <v-flex xs12>
-                                        <h5>active companie name</h5>
+                                        <h5>gain companie name</h5>
 
                                     </v-flex>
                                     <v-flex xs12 justify-center align-center justify-start>
                                         <span>
-                                            active companie symbol
+                                            gain companie symbol
                                         </span>
                                         <span>
-                                            {{index + 1}}
+                                            sss
                                         </span>
 
                                     </v-flex>
@@ -85,7 +86,7 @@
                   <v-flex xs12 md6 lg6>
                       <h5>STOCK VALUE</h5>
                       <div><span class="display-1"><b id="stock_value">1.55 USD</b></span> <span id="stock_tax_value">+0.020</span></div>
-                      <p>At close: 4:00 PM EST</p>
+                      <p id="close_Time"></p>
                   </v-flex>
                   <v-flex xs12 md6 lg6>
                       <h5>SECTOR</h5>
@@ -94,7 +95,26 @@
               </v-layout>
               <v-layout wrap="">
                 <v-flex xs12>
-                  <Grafica></Grafica>
+                  <!-- <Grafica></Grafica> -->
+               
+                   <v-simple-table  fixed-header height="65vh">
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">Volume</th>
+                          <th class="text-left">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in infoTable" :key="index">
+                          <td>{{ infoTable[index].volume }}</td>
+                          <td>{{ infoTable[index].label }}</td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+
+                  
                 </v-flex>
               </v-layout>
             </div>
@@ -119,8 +139,9 @@ export default {
   data(){
     return{
        symbolsArray: [],
-       topSymbolsArray: [],
-       busqueda: 'asdas'
+       masterArray: [],
+       infoTable: [],
+       busqueda: 'Busqueda chida'
     }
   },
   components:{
@@ -170,62 +191,72 @@ export default {
           document.getElementById('tap_active_companies').classList.add('active_tap');
 
         },
-        refreshDetail(i){
-          console.log(this.topSymbolsArray[i].companyName);
-          console.log(this.topSymbolsArray[i].symbol);
-          console.log(this.topSymbolsArray[i].sector);
+        async refreshDetail(i){
+
+          let tableInfo = []
+
+          console.log("---------");
+          console.log(this.masterArray[i].name);
+          console.log(this.masterArray[i].symbol);
+          console.log(this.masterArray[i].closeTime);
+          
 
           document.getElementById('select_company_display').classList.add('desactive_ui');
           document.getElementById('detail_company_display').classList.add('active_ui');
 
-          document.getElementById('companyName_Detail').textContent = this.topSymbolsArray[i].companyName;
-          document.getElementById('symbol_Detail').textContent = this.topSymbolsArray[i].symbol;
-          document.getElementById('sector_Detail').textContent = this.topSymbolsArray[i].sector;
-          document.getElementById('stock_value').textContent = this.topSymbolsArray[0].stockValue;
-          document.getElementById('stock_tax_value').textContent = (this.topSymbolsArray[0].stockValue*0.05)+' '+ this.topSymbolsArray[0].currency
+          document.getElementById('companyName_Detail').textContent = this.masterArray[i].name;
+          document.getElementById('symbol_Detail').textContent = this.masterArray[i].symbol;
+
+          if(this.masterArray[i].closeTime === null){
+              document.getElementById('close_Time').textContent = "Not close Time";
+          }else{
+              document.getElementById('close_Time').textContent = this.masterArray[i].closeTime;
+          }
+          
+          tableInfo = await axios.get('https://sandbox.iexapis.com/stable/stock/twtr/chart/max?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
+          this.infoTable = tableInfo.data
+          console.log("tableInfo: ")
+          console.log(tableInfo)
+
+          
+          //document.getElementById('sector_Detail').textContent = this.topSymbolsArray[i].sector;
+          //document.getElementById('stock_value').textContent = this.topSymbolsArray[0].stockValue;
+          //document.getElementById('stock_tax_value').textContent = (this.topSymbolsArray[0].stockValue*0.05)+' '+ this.topSymbolsArray[0].currency
         },
-    
         async getSymbolsInfo(){
           
                 //method vars
                 let InfoCompany = []
+                let mostActive = []
+               
 
-                //request for list of symbols
-                let SymbolsList = await axios.get('https://sandbox.iexapis.com/stable/ref-data/symbols?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb',{ params:{
-                  _limit:"5"
-                }})
-                this.symbolsArray = await SymbolsList.data
-                console.log(SymbolsList.data)
-                //fill array with info
-                for(let i = 0; i<= 1; i++){
-                    let Cashdata = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ this.symbolsArray[i].symbol +'/cash-flow?period=annual&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')    
-                    let SymbolInfo = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ this.symbolsArray[i].symbol +'/company?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
-                    let StockValueCompany = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ this.symbolsArray[0].symbol +'/dividends/5y?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
-                    console.log(StockValueCompany)
-                         InfoCompany.push(
-                        {
-                            symbol: this.symbolsArray[i].symbol,
-                            income: Cashdata.data.cashflow[0].cashFlow,
-                            companyName: SymbolInfo.data.companyName,
-                            sector: SymbolInfo.data.sector,
-                            stockValue: StockValueCompany.data[0].amount,
-                            currency: StockValueCompany.data[0].currency
+                mostActive = await axios.get('https://sandbox.iexapis.com/stable/stock/market/collection/list?collectionName=mostactive&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                
 
-                        })
+                console.log('mostActive: ')
+                console.log(mostActive.data)
+
+                for(let i = 0; i<= mostActive.data.length-2; i++){
+                  console.log('entro')
+                  this.masterArray.push({
+                    name : mostActive.data[i].companyName,
+                    symbol : mostActive.data[i].symbol,
+                    closeTime : mostActive.data[i].closeTime,
+
+                  })
                 }
-                //order array
-                this.topSymbolsArray = InfoCompany.sort((a, b) => parseFloat(a.income) - parseFloat(b.income));
-                console.log("topSymbolsArray: ")
-                console.log(this.topSymbolsArray)
-                //add stockValue
-
+                console.log("masterArray: ")
+                console.log(this.masterArray)
                 },
 
         },
    
+   
 
     created(){
         this.getSymbolsInfo()
+
+
     },
 
 
@@ -233,6 +264,16 @@ export default {
 </script>
 
 <style scoop>
+.detail_list_row{
+display:flex;
+flex-direction: row;
+  
+  background-color:white;
+  border: 1px solid #dddddd;
+  padding:25px;
+  width:100%;
+ 
+}
 .textfield_search{
   background-color:white;
   display:flex;
@@ -260,7 +301,7 @@ export default {
   opacity: .5;
 }
   #active_companies_ul{
-    display:none !important;
+    display:none;
   }
  #detail_company_display{
    display:none;

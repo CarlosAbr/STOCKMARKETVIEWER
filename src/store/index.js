@@ -7,7 +7,8 @@ export default new Vuex.Store({
     state: {
         symbolsArray: [],
         topSymbolsArray: [],
-        value: "120"
+        value: "120",
+        
 
     },
     mutations: {},
