@@ -21,8 +21,8 @@
             </v-card>
           </v-dialog>
     <v-layout wrap>
-      <v-flex xs12 md5 lg5>
-            <v-layout class="pt-5 pl-5 pb-0 pr-5 list_content info" justify-center align-center wrap>
+      <v-flex xs12 md5 lg5 id="companies_list_containers">
+            <v-layout class="pt-5 pl-5 pb-0 pr-5 list_content info"  justify-center align-center wrap>
                 <v-flex align-self-center xs6 md12 lg12>
                     <h4 class="white--text">
                         Search companies by symbol
@@ -33,11 +33,12 @@
                     <img @click="search_method" src="../assets/Asset_Search.svg" alt="">
                 </v-flex>
             </v-layout>
+
             <v-layout justify-center>
                 <v-flex id="tap_gain_companies" @click="show_gain_companies()" class="active_tap pt-3 pb-3" text-center xs6>Top Most Active Companies</v-flex>
                 <v-flex id="tap_active_companies" @click="show_active_companies()" class="pt-3 pb-3" text-center xs6>Top Gain Companies</v-flex>
             </v-layout>
-
+            <!-- List of companies -->
             <v-layout justify-center>
                 <v-flex>
                     <ul id="gain_companies_ul"  style="padding: 0; list-style:none;">
@@ -87,7 +88,6 @@
                         </li>
                     </ul>
 
-                    
                       <ul id="search_companies_ul" style="padding: 0; list-style:none;" >
                         <li @click="refreshDetail(index, masterArraySearch) " v-for="(item, index) of masterArraySearch" :key="index">
                           
@@ -111,17 +111,45 @@
                         </li>
                     </ul>
 
+                    <div class="pt-3 pb-3 pl-4 pr-4 table_row">
+                      <v-layout wrap>
+                        <v-layout>
+                          <v-flex xs1 style="background-color:green;" class="primary">
+                            <center><img height="30px" src="@/assets/Asset_Arrow.svg" alt="backArrow"></center>
+                          </v-flex>
+                          <v-flex xs11>
+                              <v-flex xs12>
+                                <h5>sdasd</h5>
+                              </v-flex>
+                              <v-flex xs12 justify-center align-center justify-start>
+                                <span>
+                                  sadas
+                                </span>
+                                <span>
+                                  asd
+                                </span>
+                              </v-flex>
+                          </v-flex>
+                        </v-layout>
+                      </v-layout>
+                    </div>
+
                 </v-flex>
             </v-layout>
 
       </v-flex>
-      <v-flex  class="pt-5 pl-5 pb-0 pr-5 detail_content" xs12 md7 lg7>
+      <v-flex  class="pt-5 pl-5 pb-0 pr-5 detail_content accent_light" xs12 md7 lg7>
+        <!-- dummy -->
         <v-layout id="select_company_display" align-center style="height:100vh;" wrap>
           <v-flex>
-              <img style="width:100px;" src="@/assets/Asset_Graphic.svg" alt="">
-              <p class="display-0">Select a company to display data</p>
+              <center><img style="width:8vh" src="@/assets/Asset_Graphic.svg" alt=""></center>
+              <center><p class="display-0">Select a company to display data</p></center>
           </v-flex>
+
+          <!-- Detail -->
         </v-layout>
+
+        <!-- detail -->
             <div id="detail_company_display">
               <v-layout wrap>
                   <v-flex xs12>
@@ -132,7 +160,7 @@
               <v-layout wrap>
                   <v-flex xs12 md6 lg6>
                       <h5>STOCK VALUE</h5>
-                      <div><span class="display-1"><b id="stock_value">1.55 USD</b></span> <span id="stock_tax_value">+0.020</span></div>
+                      <div><span class="display-1"><b id="stock_value">1.55 USD</b></span> </div>
                       <p id="close_Time"></p>
                   </v-flex>
                   <v-flex xs12 md6 lg6>
@@ -140,22 +168,27 @@
                       <p id="sector_Detail">SIC-7311 Services-Advertising Agencies Technology Services</p>
                   </v-flex>
               </v-layout>
+
+              <!-- tabla y botones -->
               <v-layout wrap="">
+                <!-- table Buttones events -->
                 <v-flex xs12>
-                  <v-btn @click="reloadTable(1, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>1D</v-btn>
-                  <v-btn @click="reloadTable(2, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>5D</v-btn>
-                  <v-btn @click="reloadTable(3, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>1M</v-btn>
-                  <v-btn @click="reloadTable(4, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>6M</v-btn>
-                  <v-btn @click="reloadTable(5, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>YTD</v-btn>
-                  <v-btn @click="reloadTable(6, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>1Y</v-btn>
-                  <v-btn @click="reloadTable(7, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>5Y</v-btn>
-                  <v-btn @click="reloadTable(8, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>MAX</v-btn>
+                  <v-btn @click="reloadTable(1, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>1D</v-btn>
+                  <v-btn @click="reloadTable(2, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>5D</v-btn>
+                  <v-btn @click="reloadTable(3, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>1M</v-btn>
+                  <v-btn @click="reloadTable(4, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>6M</v-btn>
+                  <v-btn @click="reloadTable(5, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>YTD</v-btn>
+                  <v-btn @click="reloadTable(6, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>1Y</v-btn>
+                  <v-btn @click="reloadTable(7, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>5Y</v-btn>
+                  <v-btn @click="reloadTable(8, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info_light" small>MAX</v-btn>
 
                 </v-flex>
-                <v-flex xs12 style="height:55vh; overflow-y:scroll;">
+                <!-- Tabla -->
+                <h5 style="specificTypeTable" class="ml-5 mr-5 mb-5">{{typeTable}}</h5>
+                <v-flex xs12>
                   <!-- <Grafica></Grafica> -->
-
-                   <v-simple-table  fixed-header height="100%">
+                  
+                   <v-simple-table  fixed-header height="55vh">
                     <template v-slot:default>
                       <thead>
                         <tr>
@@ -210,6 +243,7 @@ export default {
        masterArraySearch: '',
        activeCompanieOnDetail: [],
        busqueda: '',
+       typeTable:'',
        flag: false
     }
   },
@@ -217,7 +251,6 @@ export default {
     Grafica
   },
       methods:{
-        
         show_gain_companies(){
           document.getElementById('gain_companies_ul').classList.add('active_ui');
           document.getElementById('gain_companies_ul').classList.remove('desactive_ui');
@@ -240,7 +273,7 @@ export default {
           document.getElementById('active_companies_ul').classList.add('active_ui');
           document.getElementById('active_companies_ul').classList.remove('desactive_ui');
           
-          document.getElementById('tap_gain_companies').classList.remove('active_tap');
+          document.getElementById('tap_gain_companies').classList.remove('active_tap ');
           document.getElementById('tap_active_companies').classList.add('active_tap');
           
           document.getElementById('search_companies_ul').classList.remove('active_ui');
@@ -289,63 +322,55 @@ export default {
         },
         async reloadTable(i, activeSymbol){
           let infoTable;
-          
+          let specificTypeTable = document.getElementById('specificTypeTable')
             switch(i){
                 //1D
                 case 1:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/date/20190109?chartByDay=true&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(1)
+                  this.typeTable = "1 DAY"
                 break;
                 //5D
                 case 2:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/5d?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(2)
+                  this.typeTable = "5 DAY"
                 break;
                 //1M
                 case 3:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/1m?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(3)
+                  this.typeTable = "1 MONTH"
                 break;
                 //6M
                 case 4:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/6m?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(4)
+                  this.typeTable = "6 MONTHS"
                 break;
                 //YTD
                 case 5:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/ytd?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(5)
+                  this.typeTable = "CURRENT YEAR"
                 break;
                 //1Y
                 case 6:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/1y?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(6)
+                  this.typeTable = "1 YEAR"
                 break;
                 //5Y
                 case 7:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/5y?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(7)
+                  this.typeTable = "5 YEARS"
                 break;
                 //MAX
                 case 8:
                   infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/max?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
                   this.infoTable = infoTable.data
-                  console.log(infoTable.data)
-                  console.log(8)
+                  this.typeTable = "MAX RANGE"
                 break;
             }
         },
@@ -430,24 +455,35 @@ export default {
     created(){
         this.getSymbolsInfo()
         this.masterArrayTemporal = this.masterArrayActive
-
-
     },
-
-
 }
 </script>
 
 <style scoop>
 
 @media (max-width:900px) and (min-width: 600px) {
- #gain_companies_ul,
-#active_companies_ul,
-#search_companies_ul{
-  columns:2;
-  
+  #gain_companies_ul,
+  #active_companies_ul,
+  #search_companies_ul{
+    columns:2;
+  }
+
+  ul li{
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  #companies_list_containers{
+    height:100% !important;
+    overflow-y:scroll;
+  }
+
 }
-}
+
+#companies_list_containers{
+    height:100vh;
+    overflow-y:scroll;
+  }
 
 .detail_list_row{
 display:flex;
