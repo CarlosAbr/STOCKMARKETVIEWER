@@ -48,14 +48,15 @@
                                         <h5>{{masterArrayActive[index].name}}</h5>
 
                                     </v-flex>
-                                    <v-flex xs12 justify-center align-center justify-start>
+                                    <v-flex xs11>
                                         <span>
                                             {{masterArrayActive[index].symbol}}
                                         </span>
-                                        <span>
+                                    </v-flex>
+                                    <v-flex xs1>
+                                         <span>
                                             {{index + 1}}
                                         </span>
-
                                     </v-flex>
                                 </v-layout>
                             </div>
@@ -71,14 +72,15 @@
                                         <h5>{{masterArrayGain[index].name}}</h5>
 
                                     </v-flex>
-                                    <v-flex xs12 justify-center align-center justify-start>
+                                    <v-flex xs11 justify-center align-center justify-start>
                                         <span>
                                             {{masterArrayGain[index].symbol}}
                                         </span>
+                                    </v-flex>
+                                    <v-flex xs1>
                                         <span>
-                                            sss
+                                          {{index+1}}
                                         </span>
-
                                     </v-flex>
                                 </v-layout>
                             </div>
@@ -140,20 +142,37 @@
               </v-layout>
               <v-layout wrap="">
                 <v-flex xs12>
+                  <v-btn @click="reloadTable(1, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>1D</v-btn>
+                  <v-btn @click="reloadTable(2, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>5D</v-btn>
+                  <v-btn @click="reloadTable(3, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>1M</v-btn>
+                  <v-btn @click="reloadTable(4, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>6M</v-btn>
+                  <v-btn @click="reloadTable(5, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>YTD</v-btn>
+                  <v-btn @click="reloadTable(6, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>1Y</v-btn>
+                  <v-btn @click="reloadTable(7, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>5Y</v-btn>
+                  <v-btn @click="reloadTable(8, activeCompanieOnDetail)" class="ml-5 mr-5 mb-5 info" small>MAX</v-btn>
+
+                </v-flex>
+                <v-flex xs12 style="height:55vh; overflow-y:scroll;">
                   <!-- <Grafica></Grafica> -->
-               
-                   <v-simple-table  fixed-header height="65vh">
+
+                   <v-simple-table  fixed-header height="100%">
                     <template v-slot:default>
                       <thead>
                         <tr>
                           <th class="text-left">Volume</th>
                           <th class="text-left">Date</th>
+                          <th class="text-left">High</th>
+                          <th class="text-left">Lows</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr v-for="(item, index) in infoTable" :key="index">
                           <td>{{ infoTable[index].volume }}</td>
                           <td>{{ infoTable[index].label }}</td>
+                          <td>${{ infoTable[index].high }}</td>
+                          <td>${{ infoTable[index].low }}</td>
+                          
+                          
                         </tr>
                       </tbody>
                     </template>
@@ -188,7 +207,8 @@ export default {
        infoTable: [],
        masterArrayActive: [],
        masterArrayGain: [],
-       masterArraySearch: [],
+       masterArraySearch: '',
+       activeCompanieOnDetail: [],
        busqueda: '',
        flag: false
     }
@@ -235,7 +255,6 @@ export default {
           try{
             this.flag = true
             searchArraySuggest = await axios.get('https://sandbox.iexapis.com/stable/search/' + this.busqueda + '?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
-            console.log(searchArraySuggest.data.length)
 
             for(let i = 0; i<= searchArraySuggest.data.length - 1; i++){
             searchElement = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ searchArraySuggest.data[i].symbol+'/book?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
@@ -244,6 +263,7 @@ export default {
                 name: searchElement.data.quote.companyName,
                 symbol : searchElement.data.quote.symbol,
                 closeTime : searchElement.data.quote.closeTime,
+                latestPrice: searchElement.data.quote.latestPrice
               })
             }
 
@@ -265,11 +285,73 @@ export default {
           finally{
             this.flag = false
           }
-          console.log(this.masterArraySearch)
+          
+        },
+        async reloadTable(i, activeSymbol){
+          let infoTable;
+          
+            switch(i){
+                //1D
+                case 1:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/date/20190109?chartByDay=true&token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(1)
+                break;
+                //5D
+                case 2:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/5d?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(2)
+                break;
+                //1M
+                case 3:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/1m?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(3)
+                break;
+                //6M
+                case 4:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/6m?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(4)
+                break;
+                //YTD
+                case 5:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/ytd?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(5)
+                break;
+                //1Y
+                case 6:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/1y?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(6)
+                break;
+                //5Y
+                case 7:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/5y?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(7)
+                break;
+                //MAX
+                case 8:
+                  infoTable = await axios.get('https://sandbox.iexapis.com/stable/stock/'+ activeSymbol +'/chart/max?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb');
+                  this.infoTable = infoTable.data
+                  console.log(infoTable.data)
+                  console.log(8)
+                break;
+            }
         },
         async refreshDetail(i, arrayListado){
-          console.log('update')
-          console.log(arrayListado)
+          
+          
           let tableInfo = []
           let sector = ''
 
@@ -287,19 +369,17 @@ export default {
               }else{
                   document.getElementById('close_Time').textContent = arrayListado[i].closeTime;
               }
-              
+
               tableInfo = await axios.get('https://sandbox.iexapis.com/stable/stock/twtr/chart/max?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb')
               this.infoTable = tableInfo.data
-              console.log("tableInfo: ")
-              console.log(tableInfo)
+
 
               sector = await axios.get('https://sandbox.iexapis.com/stable/stock/'+arrayListado[i].symbol+'/company?token=Tsk_f780f7a36d8b4865b6dfb4906488adfb&filter=sector')
-              console.log("sector: ")
-              console.log(sector)
 
               document.getElementById('sector_Detail').textContent = sector.data.sector;
-              //document.getElementById('stock_value').textContent = this.topSymbolsArray[0].stockValue;
-              //document.getElementById('stock_tax_value').textContent = (this.topSymbolsArray[0].stockValue*0.05)+' '+ this.topSymbolsArray[0].currency
+              document.getElementById('stock_value').textContent = arrayListado[i].latestPrice + "USD";
+              this.activeCompanieOnDetail = arrayListado[i].symbol
+
           }catch(error){
             console.log(error)
           }finally{
@@ -308,7 +388,7 @@ export default {
 
         },
         async getSymbolsInfo(){
-          
+              
                 //method vars
                 let InfoCompany = []
                 let mostActive = []
@@ -327,6 +407,7 @@ export default {
                             name : mostGain.data[i].companyName,
                             symbol : mostGain.data[i].symbol,
                             closeTime : mostGain.data[i].closeTime,
+                            latestPrice: mostGain.data[i].latestPrice
                           })
                         }
                         //top actives fill array
@@ -334,6 +415,7 @@ export default {
                           name : mostActive.data[i].companyName,
                           symbol : mostActive.data[i].symbol,
                           closeTime : mostActive.data[i].closeTime,
+                          latestPrice: mostGain.data[i].latestPrice
                         })
                       }
                   
@@ -357,6 +439,16 @@ export default {
 </script>
 
 <style scoop>
+
+@media (max-width:900px) and (min-width: 600px) {
+ #gain_companies_ul,
+#active_companies_ul,
+#search_companies_ul{
+  columns:2;
+  
+}
+}
+
 .detail_list_row{
 display:flex;
 flex-direction: row;
