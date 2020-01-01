@@ -255,8 +255,8 @@ export default {
           document.getElementById('active_companies_ul').classList.add('active_ui');
           document.getElementById('active_companies_ul').classList.remove('desactive_ui');
           
-          document.getElementById('tap_gain_companies').classList.remove('active_tap ');
-          document.getElementById('tap_active_companies').classList.add('active_tap');
+          document.getElementById('tap_active_companies').classList.remove('active_tap');
+          document.getElementById('tap_gain_companies').classList.add('active_tap');
           
           document.getElementById('search_companies_ul').classList.remove('active_ui');
           document.getElementById('search_companies_ul').classList.add('desactive_ui');
